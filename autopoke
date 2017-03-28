@@ -14,7 +14,7 @@ DOMAINLIST="/loot/domain-list"
 DOMAINHTTPPORT="/loot/domains-with-http-port"
 TEMP="temporary-file"
 
-BRUTE="0" # by default we use brute force attacks
+BRUTE="1" # by default we use brute force attacks
 
 
 OKRED='\033[91m'
@@ -171,10 +171,8 @@ fi
 
 parse-ips
 parse-domains
-
 run-nmap
 find-http
-#run-nikto
 run-checkpwn
 
 

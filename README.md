@@ -101,7 +101,10 @@ docker run --rm -it --volume ./loot:/loot valtteri/autopoke autopoke <example.co
 * the output files will be in the loot directory
 ```
 
-### Arguments
+### Modes
+```
+-nb    # No bruteforcing, much faster
+```
 TODO
 
 
