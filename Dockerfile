@@ -17,9 +17,11 @@ RUN apt-get update && apt-get install -y \
     && pip install pypwned termcolor
 
 
-# Add paths
-RUN echo 'export PATH=$PATH:/poke' >> ~/.bashrc && \
-    echo 'export PATH=$PATH:/poke/tools' >> ~/.bashrc
+# AutoPoke
+RUN git clone https://github.com/ValtteriL/AutoPoke.git && \
+    echo 'export PATH=$PATH:/AutoPoke' >> ~/.bashrc && \
+    echo 'export PATH=$PATH:/AutoPoke/tools' >> ~/.bashrc
+
 
 # Sublist3r
 RUN git clone https://github.com/aboul3la/Sublist3r.git && \
@@ -40,15 +42,6 @@ RUN git clone https://github.com/TheRook/subbrute.git && \
     echo 'export PATH=$PATH:/subbrute' >> ~/.bashrc && \
     cd /
     
-  
-# add scripts
-ADD recon.sh /poke/
-ADD tools/ip_parser.py /poke/tools/
-ADD tools/domain_parser.py /poke/tools/
-ADD tools/hostname_to_ip.py /poke/tools/
-ADD tools/check_pwn.py /poke/tools/
-ADD tools/find_http.py /poke/tools/
-
 
 # add volume
 VOLUME /loot

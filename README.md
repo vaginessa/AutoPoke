@@ -11,28 +11,27 @@ Provides good starting point for penetration test.
 ## How it works?
 ### 1. Subdomain enumeration
 
-#### Fierce
-http://ha.ckers.org/fierce/
+#### Fierce http://ha.ckers.org/fierce/
 ```
 fierce -threads 8 -dns $TARGET
+
 or
+
 fierce -threads 8 -dns $TARGET -wide
 
-* depending if brute force is enabled
+* depending on if brute force is enabled
 ```
 
-#### Sublist3r
-https://github.com/aboul3la/Sublist3r
+#### Sublist3r https://github.com/aboul3la/Sublist3r
 ```
 sublist3r.py -t 8 -d $TARGET
 or
 sublist3r.py -b -t 8 -d $TARGET
 
-* depending if brute force is enabled
+* depending on if brute force is enabled
 ```
 
-#### SubBrute
-https://github.com/TheRook/subbrute
+#### SubBrute https://github.com/TheRook/subbrute
 ```
 subbrute.py $TARGET
 
@@ -51,25 +50,25 @@ theharvester -d $TARGET -v -l 1000 -b all
 
 ### 3. Port scanning
 
-#### Nmap
-https://github.com/nmap/nmap
+#### Nmap https://github.com/nmap/nmap
 ```
 nmap -A -p1-65335 -oA nmap \
     --script "ms-sql-empty-password,mysql-empty-password"\
     -iL $IPLIST
+
 or
+
 nmap -A -p1-65335 -oA nmap \
     --script "http-vhosts,http-default-accounts,ms-sql-empty-password,mysql-empty-password"\
     -iL $IPLIST
 
-* depending if brute force is enabled
+* depending on if brute force is enabled
 ```
 
 
 ### 4. Web server scanning
 
-#### Nikto
-https://github.com/sullo/nikto
+#### Nikto https://github.com/sullo/nikto
 ```
 TODO
 ```
@@ -77,8 +76,7 @@ TODO
 
 ### 5. SQL injection scanning
 
-#### SQLMap
-https://github.com/sqlmapproject/sqlmap
+#### SQLMap https://github.com/sqlmapproject/sqlmap
 ```
 sqlmap --threads=8 --crawl=5 --batch --smart --random-agent --forms --is-dba --dbs -u $var1
 ```
@@ -92,7 +90,9 @@ docker pull valtteri/autopoke
 
 ## Usage
 ```
-docker run --rm -it valtteril/autopoke autopoke <example.com> [mode]
+docker run --rm -it --volume ./loot:/loot valtteri/autopoke autopoke <example.com> [mode]
+
+* the output files will be in the loot directory
 ```
 
 ### Arguments
