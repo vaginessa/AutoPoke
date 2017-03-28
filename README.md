@@ -3,9 +3,9 @@
 RESEARCH purposes ONLY. AutoPoke is ONLY intended to be used on your own pentesting labs, or with explicit consent from the owner of the property being tested.**
 
 # AutoPoke
-AutoPoke is a tool to conduct basic penetration tests automatically
-The tool was developed to practice the author's bash and python scripting skills and to automate grunt work
-Provides good starting point for penetration test
+AutoPoke is a tool to conduct basic penetration tests automatically.
+The tool was developed to practice the author's bash and python scripting skills and to automate grunt work.
+Provides good starting point for penetration test.
 
 
 ## How it works?
