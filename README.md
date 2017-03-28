@@ -41,8 +41,7 @@ subbrute.py $TARGET
 
 ### 2. Harvest email addresses
 
-#### theHarvester
-https://github.com/laramies/theHarvester
+#### theHarvester https://github.com/laramies/theHarvester
 ```
 theharvester -d $TARGET -v -l 1000 -b all
 ```
@@ -76,9 +75,16 @@ TODO
 
 ### 5. SQL injection scanning
 
-#### SQLMap https://github.com/sqlmapproject/sqlmap
+#### sqlmap https://github.com/sqlmapproject/sqlmap
 ```
 sqlmap --threads=8 --crawl=5 --batch --smart --random-agent --forms --is-dba --dbs -u $var1
+```
+
+
+### 6. Check emails for breaches
+#### PyPwned https://github.com/icanhasfay/PyPwned
+```
+Checks the emails found with theHarvester against haveibeenpwned database
 ```
 
 
