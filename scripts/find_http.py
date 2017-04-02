@@ -84,7 +84,6 @@ for ipPort in ipPortList:
                         if hpd[2] == contenthash: # if content is identical, we dont care if its https or not
                             hpd[0].append(hostip[0])
                             hpd[1].append(port)
-                            hpd[1] = list(set(hpd[1]))
                             gotAssigned = True
                             break
                     if not gotAssigned:
@@ -113,7 +112,6 @@ for ipPort in ipPortList:
                     if hpd[2] == contenthash: # if content is identical, we dont care if its https or not
                         hpd[0].append(ipPort[0])
                         hpd[1].append(port)
-                        hpd[1] = list(set(hpd[1]))
                         gotAssigned = True
                         break
                 if not gotAssigned:
