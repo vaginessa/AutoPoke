@@ -15,6 +15,7 @@ import ipaddress
 import pickle
 import socket
 import sys
+from termcolor import colored
 
 # check the arguments
 if len(sys.argv) is not 2:
