@@ -98,9 +98,9 @@ docker run --rm -it --volume ./loot:/loot valtteri/autopoke autopoke <example.co
 ## Limitations
 As automated tools usually, AutoPoke has limitations.
 Limitations include:
--might not find all subdomains -> might not scan whole range if the subdomain is highest/lowest
--might scan hosts that don't belong to target (if non-continuous ip-range in /24)
--might not identify every different web app as only /'s are compared
+- might not find all subdomains -> might not scan whole range if the subdomain is highest/lowest
+- might scan hosts that don't belong to target (if non-continuous ip-range in /24)
+- might not identify every different web app as only /'s are compared
 
 
 ## Future
