@@ -4,31 +4,23 @@ RESEARCH purposes ONLY. AutoPoke is ONLY intended to be used on your own pentest
 
 # AutoPoke
 AutoPoke is a tool to conduct basic penetration tests automatically.
+AutoPoke derives its firepower from well-known security tools.
 The tool was developed to practice the author's bash and python scripting skills and to automate grunt work.
 Provides good starting point for penetration test.
 
 
 ## How it works?
 ### 1. Subdomain enumeration
+Subdomains of the target are enumerated using a couple of tools.
 
 #### Fierce http://ha.ckers.org/fierce/
 ```
-fierce -threads 8 -dns $TARGET
-
-or
-
-fierce -threads 8 -dns $TARGET -wide
-
-* depending on if brute force is enabled
+fierce -threads 8 -dns $TARGET [-wide]
 ```
 
 #### Sublist3r https://github.com/aboul3la/Sublist3r
 ```
-sublist3r.py -t 8 -d $TARGET
-or
-sublist3r.py -b -t 8 -d $TARGET
-
-* depending on if brute force is enabled
+sublist3r.py [-b] -t 8 -d $TARGET
 ```
 
 #### SubBrute https://github.com/TheRook/subbrute
@@ -48,36 +40,33 @@ theharvester -d $TARGET -v -l 1000 -b all
 
 
 ### 3. Port scanning
+The subdomains are resolved to ip addresses and the addresses are used to generate ip ranges.
+The ip ranges are scanned for open ports.
 
 #### Nmap https://github.com/nmap/nmap
 ```
-nmap -A -p1-65335 -oA nmap \
-    --script "ms-sql-empty-password,mysql-empty-password"\
+nmap -sV -sC -p1-65335 -oA nmap \
+    --script "[http-vhosts,http-default-accounts],ms-sql-empty-password,mysql-empty-password"\
     -iL $IPLIST
-
-or
-
-nmap -A -p1-65335 -oA nmap \
-    --script "http-vhosts,http-default-accounts,ms-sql-empty-password,mysql-empty-password"\
-    -iL $IPLIST
-
-* depending on if brute force is enabled
 ```
 
 
 ### 4. Web server scanning
+Where open http* services are detected, are requested using all subdomains that point to that host.
+All unique web applications are grouped and only one of each different application is scanned using nikto.
 
 #### Nikto https://github.com/sullo/nikto
 ```
-TODO
+nikto -host $var1 -port $var2 [-ssl]
 ```
 
 
 ### 5. SQL injection scanning
+The same unique web applications that got scanned with nikto, are scanned using sqlmap.
 
 #### sqlmap https://github.com/sqlmapproject/sqlmap
 ```
-sqlmap --threads=8 --crawl=5 --batch --smart --random-agent --forms --is-dba --dbs -u $var1
+sqlmap --threads=8 --crawl=5 --batch --smart --random-agent --forms --is-dba --dbs -u http[s]://$var1:$var2/
 ```
 
 
@@ -105,12 +94,13 @@ docker run --rm -it --volume ./loot:/loot valtteri/autopoke autopoke <example.co
 ```
 -nb    # No bruteforcing, much faster
 ```
-TODO
-
 
 ## Limitations
-As automated tool usually, AutoPoke has limitations.
-TODO
+As automated tools usually, AutoPoke has limitations.
+Limitations include:
+-might not find all subdomains -> might not scan whole range if the subdomain is highest/lowest
+-might scan hosts that don't belong to target (if non-continuous ip-range in /24)
+-might not identify every different web app as only /'s are compared
 
 
 ## Future
