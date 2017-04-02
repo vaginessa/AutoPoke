@@ -27,7 +27,10 @@ ipToHostname = [] # (hostname, ip)
 
 # for each hostname, get the ip
 for hostname in sys.stdin:
-    ipToHostname.append((hostname.strip(),socket.gethostbyname(hostname.strip())))
+    try:
+        ipToHostname.append((hostname.strip(),socket.gethostbyname(hostname.strip())))
+    except Exception as e:
+        print(colored(str(hostname) + ': ' + str(e),"red"), file=sys.stderr)
 
 
 # save the hostname-ip list for later use
