@@ -31,7 +31,7 @@ for hostname in sys.stdin:
     try:
         ipToHostname.append((hostname.strip(),socket.gethostbyname(hostname.strip())))
     except Exception as e:
-        print(colored(str(hostname) + ': ' + str(e),"red"), file=sys.stderr)
+        print(colored(str(hostname.strip()) + ': ' + str(e),"red"), file=sys.stderr)
 
 
 # save the hostname-ip list for later use
