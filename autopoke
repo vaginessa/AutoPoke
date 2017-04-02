@@ -9,7 +9,6 @@ SUBBRUTEFILE="/loot/subbrute"
 CHECKPWNFILE="/loot/checkpwn"
 
 
-IPLIST="/loot/ip-list"
 DOMAINLIST="/loot/domain-list"
 DOMAINHTTPPORT="/loot/domains-with-http-port"
 RANGES="/loot/ip-ranges"
@@ -66,7 +65,9 @@ function run-sublister {
 function run-subbrute {
     echo -e "$OKORANGE \n##### RUNNING SubBrute #####\n $RESET"
     echo -e "$OKRED""This will take a while...(several hours)""$RESET"
+    cd /opt/subbrute
     subbrute.py $TARGET | tee $SUBBRUTEFILE
+    cd -
 }
 
 #########################################################################
@@ -75,6 +76,7 @@ function run-subbrute {
 function parse-domains {
     echo -e "$OKORANGE \n##### Parsing Domains #####\n $RESET"
     cat $FIERCEFILE $HARVESTERFILE $SUBLISTERFILE $SUBBRUTEFILE 2>/dev/null | domain_parser.py $TARGET  >> $TEMP 
+    echo $TARGET >> $TEMP
     cat $TEMP | sort | uniq > $DOMAINLIST
     echo -e "$OKGREEN""Total unique subdomains: $(wc -l < $DOMAINLIST)""$RESET"
     rm $TEMP 
@@ -98,11 +100,11 @@ function run-nmap {
         echo -e "$OKRED""NOTE: skipping brute force""$RESET"
         nmap -sV -sC -p1-65335 -oA nmap \
         --script "ms-sql-empty-password,mysql-empty-password"\
-        -iL $IPLIST # https://nmap.org/nsedoc/scripts/http-default-accounts.html
+        -iL $RANGES # https://nmap.org/nsedoc/scripts/http-default-accounts.html
     else
         nmap -sV -sC -p1-65335 -oA nmap \
         --script "http-vhosts,http-default-accounts,ms-sql-empty-password,mysql-empty-password"\
-        -iL $IPLIST # https://nmap.org/nsedoc/scripts/http-default-accounts.html
+        -iL $RANGES # https://nmap.org/nsedoc/scripts/http-default-accounts.html
     fi
 }
 
@@ -178,6 +180,9 @@ if [[ $TARGET = "--help" ]]; then
 	help
 	exit
 fi
+
+echo -e "$OKGREEN""\nAutoPoke - by Valtteri Lehtinen""$RESET"
+
 if [[ $MODE = "-nb" ]]; then
     echo -e "$OKRED""[INFO] - no bruteforce""$RESET"
     BRUTE="0"
@@ -185,14 +190,12 @@ fi
 
 # start making noise!
 
-echo -e "$OKGREEN""\nAutoPoke - by Valtteri Lehtinen""$RESET"
-
 # search for subdomains and emails
 run-fierce
 run-theharvester
 run-sublister
 
-if [ "$BRUTE" == "0" ]; then
+if [ "$BRUTE" == "1" ]; then
     run-subbrute
 fi
 
@@ -202,6 +205,10 @@ gen-ranges # generate ip ranges from the subdomains to scan
 run-nmap # nmap scan the ranges
 
 find-http # find all unique web apps using the nmap scan results
+
+run-nikto # scan found web applications
+run-sqlmap # scan found web applications
+
 run-checkpwn # check all emails for pwnage
 
 
