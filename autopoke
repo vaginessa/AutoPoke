@@ -37,7 +37,7 @@ function help {
 # functions for finding subdomains and emails
 
 function run-fierce {
-    echo -e "$OKORANGE \n##### RUNNING FIERCE #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING FIERCE\n $RESET"
 
     if [ "$BRUTE" = "0" ]; then
         echo -e "$OKRED""NOTE: skipping brute force""$RESET"
@@ -48,12 +48,12 @@ function run-fierce {
 }
 
 function run-theharvester {
-    echo -e "$OKORANGE \n##### RUNNING theHarvester #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING theHarvester\n $RESET"
     theharvester -d $TARGET -v -l 1000 -b all | tee $HARVESTERFILE # enumerate emails, subdomains, virtualhosts. check emails for leak
 }
 
 function run-sublister {
-    echo -e "$OKORANGE \n##### RUNNING Sublist3r #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING Sublist3r\n $RESET"
     if [ "$BRUTE" = "0" ]; then
         echo -e "$OKRED""NOTE: skipping brute force""$RESET"
         sublist3r.py -t 8 -d $TARGET --output $SUBLISTERFILE # enumerate subdomains and use subbrute module
@@ -63,7 +63,7 @@ function run-sublister {
 }
 
 function run-subbrute {
-    echo -e "$OKORANGE \n##### RUNNING SubBrute #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING SubBrute\n $RESET"
     echo -e "$OKRED""This will take a while...(several hours)""$RESET"
     cd /opt/subbrute
     subbrute.py $TARGET | tee $SUBBRUTEFILE
@@ -74,7 +74,7 @@ function run-subbrute {
 # parse the subdomains out of the output of tools above
 
 function parse-domains {
-    echo -e "$OKORANGE \n##### Parsing Domains #####\n $RESET"
+    echo -e "$OKORANGE \nParsing Domains\n $RESET"
     cat $FIERCEFILE $HARVESTERFILE $SUBLISTERFILE $SUBBRUTEFILE 2>/dev/null | domain_parser.py $TARGET  >> $TEMP 
     echo $TARGET >> $TEMP
     cat $TEMP | sort | uniq > $DOMAINLIST
@@ -87,7 +87,7 @@ function parse-domains {
 # from lowest to highest in every /24 
 
 function gen-ranges {
-    echo -e "$OKORANGE \n##### Generating ip ranges from hostnames #####\n $RESET"
+    echo -e "$OKORANGE \nGenerating ip ranges from hostnames\n $RESET"
     cat $DOMAINLIST | hostname-to-range.py $PICKLE > $RANGES
 }
 
@@ -95,7 +95,7 @@ function gen-ranges {
 # normal nmap scan, all ports
 
 function run-nmap {
-    echo -e "$OKORANGE \n##### RUNNING Nmap #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING Nmap\n $RESET"
     if [ "$BRUTE" = "0" ]; then
         echo -e "$OKRED""NOTE: skipping brute force""$RESET"
         nmap -sV -sC -p1-65335 -oA nmap \
@@ -113,7 +113,7 @@ function run-nmap {
 # subdomain|port1 for every unique web application identified
 
 function find-http {
-    echo -e "$OKORANGE \n##### Searching subdomains with http #####\n $RESET"
+    echo -e "$OKORANGE \nSearching subdomains with http\n $RESET"
     find_http.py nmap.xml $PICKLE >> $DOMAINHTTPPORT 
     rm $PICKLE
     echo -e "$OKGREEN""Total hosts with unique http service: $(wc -l < $DOMAINHTTPPORT)""$RESET"
@@ -123,7 +123,7 @@ function find-http {
 # nikto scan every unique web application
 
 function run-nikto {
-    echo -e "$OKORANGE \n##### RUNNING Nikto #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING Nikto\n $RESET"
     for i in $(cat $DOMAINHTTPPORT); do
         var1=$(echo $i | cut -d '|' -f1) # hostname
         var2=$(echo $i | cut -d '|' -f2) # port
@@ -142,7 +142,7 @@ function run-nikto {
 # sqlmap scan every unique web application
 
 function run-sqlmap {
-    echo -e "$OKORANGE \n##### RUNNING SQLMap #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING SQLMap\n $RESET"
     for i in $(cat $DOMAINHTTPPORT); do
         var1=$(echo $i | cut -d '|' -f1) # hostname
         var2=$(echo $i | cut -d '|' -f2) # port
@@ -163,7 +163,7 @@ function run-sqlmap {
 # check the found emails for pwnage
 
 function run-checkpwn {
-    echo -e "$OKORANGE \n##### RUNNING CheckPwn #####\n $RESET"
+    echo -e "$OKORANGE \nRUNNING CheckPwn\n $RESET"
     cat $HARVESTERFILE | check_pwn.py | tee $CHECKPWNFILE # take all emails from theharvester and check if any has been pwned
 }
 
@@ -181,7 +181,13 @@ if [[ $TARGET = "--help" ]]; then
 	exit
 fi
 
-echo -e "$OKGREEN""\nAutoPoke - by Valtteri Lehtinen""$RESET"
+echo -e "$OKGREEN"
+cat logo
+echo -e "$RESET"
+echo -e "$OKORANGE""\t\t\t\t\tValtteri Lehtinen\n\n""$RESET"
+                                            
+
+
 
 if [[ $MODE = "-nb" ]]; then
     echo -e "$OKRED""[INFO] - no bruteforce""$RESET"
@@ -191,24 +197,33 @@ fi
 # start making noise!
 
 # search for subdomains and emails
+echo -e "$OKORANGE \n##### Phase 1/6: Subdomain enumeration ##### $RESET"
 run-fierce
-run-theharvester
 run-sublister
 
 if [ "$BRUTE" == "1" ]; then
     run-subbrute
 fi
 
-parse-domains # parse all subdomains
 
+echo -e "$OKORANGE \n##### Phase 2/6: Harvest of email addresses ##### $RESET"
+run-theharvester
+
+parse-domains # parse all subdomains
 gen-ranges # generate ip ranges from the subdomains to scan
+
+echo -e "$OKORANGE \n##### Phase 3/6: Port scanning ##### $RESET"
 run-nmap # nmap scan the ranges
 
 find-http # find all unique web apps using the nmap scan results
 
+echo -e "$OKORANGE \n##### Phase 4/6: Web server scanning ##### $RESET"
 run-nikto # scan found web applications
-run-sqlmap # scan found web applications
 
+echo -e "$OKORANGE \n##### Phase 5/6: SQL injection scanning ##### $RESET"
+run-sqlmap # scan found web applications
+    
+echo -e "$OKORANGE \n##### Phase 6/6: Checking email addresses  ##### $RESET"
 run-checkpwn # check all emails for pwnage
 
 
