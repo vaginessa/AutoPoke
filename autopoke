@@ -2,6 +2,8 @@
 TARGET="$1"
 MODE="$2"
 
+LOGO="/AutoPoke/logo"
+
 FIERCEFILE="/loot/fierce"
 HARVESTERFILE="/loot/theharvester"
 SUBLISTERFILE="/loot/sublister"
@@ -182,7 +184,7 @@ if [[ $TARGET = "--help" ]]; then
 fi
 
 echo -e "$OKGREEN"
-cat logo
+cat $LOGO
 echo -e "$RESET"
 echo -e "$OKORANGE""\t\t\t\t\tValtteri Lehtinen\n\n""$RESET"
                                             
